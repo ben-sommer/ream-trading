@@ -3,7 +3,7 @@
 export default $config({
     app(input) {
         return {
-            name: "trpc-lambda-react-todo",
+            name: "ream-trading",
             home: "aws",
             removal: input?.stage === "production" ? "retain" : "remove",
             providers: {
@@ -15,6 +15,7 @@ export default $config({
     },
     async run() {
         /* ----- Database ----- */
+
         const todoTable = new sst.aws.Dynamo("Todo", {
             fields: {
                 pk: "string",
@@ -27,6 +28,7 @@ export default $config({
         });
 
         /* ----- Auth ----- */
+
         const userPool = new sst.aws.CognitoUserPool("UserPool", {
             triggers: {
                 preSignUp: "server/auth/preSignUp.handler",

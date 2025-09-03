@@ -1,5 +1,5 @@
 {
-    "name": "trpc-lambda-react-todo",
+    "name": "ream-trading",
     "private": true,
     "workspaces": [
         "client",

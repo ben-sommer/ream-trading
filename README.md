@@ -1,1 +1,3 @@
-# trpc-lambda-react-todo
+# ream-trading
+
+## A paper trading platform
