@@ -1,0 +1,22 @@
+{
+    "name": "server",
+    "private": true,
+    "scripts": {},
+    "dependencies": {
+        "@aws-sdk/client-dynamodb": "^3.848.0",
+        "@trpc/server": "npm:@trpc/server",
+        "@types/aws-lambda": "^8.10.152",
+        "cors": "^2.8.5",
+        "effect": "^3.17.7",
+        "electrodb": "^3.4.3",
+        "zod": "^3.25.51"
+    },
+    "devDependencies": {
+        "@types/cors": "^2.8.13",
+        "@types/node": "^22.13.5",
+        "eslint": "^9.26.0",
+        "tsx": "^4.19.3",
+        "typescript": "^5.8.2"
+    },
+    "version": "0.0.1"
+}

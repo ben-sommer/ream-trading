@@ -1,0 +1,5 @@
+{
+    "routesDirectory": "./client/src/routes",
+    "generatedRouteTree": "./client/src/routeTree.gen.ts",
+    "routeFileIgnorePattern": "\\.(test|spec)\\.[jt]sx?$"
+}

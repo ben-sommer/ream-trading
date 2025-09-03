@@ -1,0 +1,29 @@
+{
+    "name": "trpc-lambda-react-todo",
+    "private": true,
+    "workspaces": [
+        "client",
+        "server"
+    ],
+    "scripts": {
+        "build:client": "vite build client",
+        "dev": "vite dev client",
+        "prepare": "husky"
+    },
+    "devDependencies": {
+        "husky": "^9.1.7",
+        "lint-staged": "^16.1.2",
+        "npm-run-all": "^4.1.5",
+        "prettier": "3.6.2",
+        "prettier-plugin-tailwindcss": "^0.6.14",
+        "start-server-and-test": "^1.12.0",
+        "wait-port": "^1.0.1"
+    },
+    "version": "0.0.1",
+    "lint-staged": {
+        "**/*": "prettier --write --ignore-unknown"
+    },
+    "dependencies": {
+        "sst": "^3.17.10"
+    }
+}
