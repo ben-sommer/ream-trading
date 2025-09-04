@@ -1,7 +1,7 @@
 import { Service } from "electrodb";
 import { User } from "./models/User";
 import { Todo } from "./models/Todo";
-import { client } from "@db/config";
+import { client } from "@db/_config";
 import { TABLE_NAME } from "./constants";
 
 // export const TodoApp = new Service(

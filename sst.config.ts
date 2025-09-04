@@ -16,6 +16,25 @@ export default $config({
     async run() {
         /* ----- Database ----- */
 
+        const { TodoTable } = await import("./server/db/tables/Todo");
+
+        const keyspace = new aws.keyspaces.Keyspace("Keyspace", {
+            name: "ream_trading_keyspace",
+        });
+
+        const newTodoTable = new aws.keyspaces.Table("TodoTable", {
+            keyspaceName: keyspace.name,
+            tableName: TodoTable.name,
+            schemaDefinition: {
+                columns: TodoTable.schema,
+                partitionKeys: [{ name: "user_id" }],
+                clusteringKeys: [{ name: "todo_id", orderBy: "ASC" }],
+            },
+            capacitySpecification: {
+                throughputMode: "PAY_PER_REQUEST",
+            },
+        });
+
         const todoTable = new sst.aws.Dynamo("Todo", {
             fields: {
                 pk: "string",
@@ -67,7 +86,7 @@ export default $config({
 
         api.route("OPTIONS /{proxy+}", {
             handler: "server/cors.handler",
-            link: [todoTable],
+            link: [todoTable, newTodoTable],
         });
 
         const server = api.route(
@@ -75,6 +94,12 @@ export default $config({
             {
                 handler: "server/index.handler",
                 link: [todoTable],
+                permissions: [
+                    sst.aws.permission({
+                        actions: ["cassandra:*"],
+                        resources: [keyspace.arn],
+                    }),
+                ],
             },
             {
                 auth: {

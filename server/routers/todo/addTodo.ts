@@ -3,6 +3,7 @@ import { z } from "zod";
 import { Todo } from "@db/services/Todo/models/Todo";
 import { TRPCError } from "@trpc/server";
 import { todoItemToResponse, TodoResponse } from ".";
+import { handler } from "@db/config";
 
 export default authenticatedProcedure
     .input(
@@ -11,6 +12,8 @@ export default authenticatedProcedure
         }),
     )
     .mutation<TodoResponse>(async ({ input, ctx }) => {
+        handler();
+
         try {
             const newTodo = await Todo.create({
                 userId: ctx.user.userId,

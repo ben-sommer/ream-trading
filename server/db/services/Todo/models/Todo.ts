@@ -1,5 +1,5 @@
 import { Entity } from "electrodb";
-import { client } from "@db/config";
+import { client } from "@db/_config";
 import { SERVICE_NAME, TABLE_NAME } from "../constants";
 
 export const Todo = new Entity(

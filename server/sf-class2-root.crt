@@ -1,13 +1,4 @@
-import cassandra from "cassandra-driver";
-import fs from "fs";
-import { fromNodeProviderChain } from "@aws-sdk/credential-providers";
-import { SigV4AuthProvider } from "aws-sigv4-auth-cassandra-plugin";
-
-export const handler = async () => {
-    // Optionally load TLS certificate for Amazon Keyspaces
-    const sslOptions = {
-        ca: [
-            `-----BEGIN CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
 MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
 MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
 U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
@@ -31,37 +22,3 @@ xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
 VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
 WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8fF5Q=
 -----END CERTIFICATE-----
-`,
-        ],
-        rejectUnauthorized: true,
-        host: `cassandra.${process.env.AWS_REGION}.amazonaws.com`,
-    };
-
-    const authProvider = new SigV4AuthProvider();
-
-    const client = new cassandra.Client({
-        contactPoints: [`cassandra.${process.env.AWS_REGION}.amazonaws.com`],
-        localDataCenter: process.env.AWS_REGION,
-        authProvider,
-        sslOptions,
-        protocolOptions: { port: 9142 },
-    });
-
-    try {
-        await client.connect();
-        console.log("Connected to AWS Keyspaces");
-
-        const result = await client.execute("SELECT * FROM system.local");
-        console.log(result);
-
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ version: result.rows[0]?.release_version }),
-        };
-    } catch (err) {
-        console.error("Connection error", err);
-        throw err;
-    } finally {
-        await client.shutdown();
-    }
-};

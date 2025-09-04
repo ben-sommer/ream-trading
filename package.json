@@ -24,6 +24,11 @@
         "**/*": "prettier --write --ignore-unknown"
     },
     "dependencies": {
+        "@aws-sdk/credential-providers": "^3.880.0",
+        "@aws-sdk/protocol-http": "^3.374.0",
+        "@aws-sdk/signature-v4": "^3.374.0",
+        "aws-sigv4-auth-cassandra-plugin": "^1.0.5",
+        "cassandra-driver": "^4.8.0",
         "sst": "^3.17.10"
     }
 }
