@@ -22,7 +22,7 @@ export const Todo = new Entity(
                 type: "string",
                 required: true,
             },
-            completed: {
+            done: {
                 type: "boolean",
                 required: true,
             },

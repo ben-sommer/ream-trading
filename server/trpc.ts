@@ -11,7 +11,6 @@ export type Context = CreateAWSLambdaContextOptions<APIGatewayProxyEventV2> & {
         email: string;
         userId: string;
     };
-    db: Client;
 };
 
 const t = initTRPC.context<Context>().create();

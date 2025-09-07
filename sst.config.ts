@@ -16,17 +16,21 @@ export default $config({
     async run() {
         /* ----- Database ----- */
 
-        const { TodoTable } = await import("./server/db/tables/Todo");
-
         const keyspace = new aws.keyspaces.Keyspace("Keyspace", {
             name: "ream_trading",
         });
 
         const newTodoTable = new aws.keyspaces.Table("TodoTable", {
             keyspaceName: keyspace.name,
-            tableName: TodoTable.name,
+            tableName: "todo",
             schemaDefinition: {
-                columns: TodoTable.schema,
+                columns: [
+                    { name: "user_id", type: "text" },
+                    { name: "todo_id", type: "timeuuid" },
+                    { name: "title", type: "text" },
+                    { name: "done", type: "boolean" },
+                    { name: "updated_at", type: "timestamp" },
+                ],
                 partitionKeys: [{ name: "user_id" }],
                 clusteringKeys: [{ name: "todo_id", orderBy: "ASC" }],
             },

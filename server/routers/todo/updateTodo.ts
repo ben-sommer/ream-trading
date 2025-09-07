@@ -4,32 +4,25 @@ import { Todo } from "@db/services/Todo/models/Todo";
 import { TRPCError } from "@trpc/server";
 import { todoItemToResponse, TodoResponse } from ".";
 import { EntityItem } from "electrodb";
+import { updateTodo } from "@db/models/Todo";
 
 export default authenticatedProcedure
     .input(
         z.object({
             todoId: z.string(),
             createdAt: z.string(),
-            completed: z.boolean(),
+            done: z.boolean(),
         }),
     )
-    .mutation<TodoResponse>(async ({ input, ctx }) => {
+    .mutation(async ({ input, ctx }) => {
         try {
-            const updateTodoResponse = await Todo.update({
+            await updateTodo({
                 userId: ctx.user.userId,
-                createdAt: input.createdAt,
                 todoId: input.todoId,
-            })
-                .set({
-                    completed: input.completed,
-                })
-                .go({
-                    response: "all_new",
-                });
+                done: input.done,
+            });
 
-            return todoItemToResponse(
-                updateTodoResponse.data as EntityItem<typeof Todo>,
-            );
+            return null;
         } catch (error) {
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",

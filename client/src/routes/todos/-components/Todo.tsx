@@ -20,7 +20,7 @@ export default function Todo({ todo }: { todo: TodoResponse }) {
                 await updateTodoMutation.mutateAsync({
                     todoId: todo.todoId,
                     createdAt: todo.createdAt,
-                    completed: e.target.checked,
+                    done: e.target.checked,
                 });
             } catch {
                 e.target.checked = !e.target.checked;
@@ -34,7 +34,7 @@ export default function Todo({ todo }: { todo: TodoResponse }) {
             <p key={todo.todoId}>{todo.title}</p>
             <input
                 type="checkbox"
-                defaultChecked={todo.completed}
+                defaultChecked={todo.done}
                 onChange={handleCheckboxChange}
                 disabled={updateTodoMutation.isPending}
             />

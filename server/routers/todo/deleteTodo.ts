@@ -1,7 +1,7 @@
 import { authenticatedProcedure } from "../../trpc";
 import z from "zod";
-import { Todo } from "@db/services/Todo/models/Todo";
 import { TRPCError } from "@trpc/server";
+import { deleteTodo } from "@db/models/Todo";
 
 export default authenticatedProcedure
     .input(
@@ -12,11 +12,7 @@ export default authenticatedProcedure
     )
     .mutation<null>(async ({ input, ctx }) => {
         try {
-            await Todo.delete({
-                userId: ctx.user.userId,
-                todoId: input.todoId,
-                createdAt: input.createdAt,
-            }).go();
+            await deleteTodo(ctx.user.userId, input.todoId);
 
             return null;
         } catch (error) {

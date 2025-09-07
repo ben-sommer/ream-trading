@@ -25,8 +25,6 @@ export const handler = awsLambdaRequestHandler({
 
         const user = event.requestContext.authorizer;
 
-        const db = await getDbClient();
-
         return {
             event,
             context,
@@ -35,7 +33,6 @@ export const handler = awsLambdaRequestHandler({
                 email: user.jwt.claims.email as string,
                 userId: user.jwt.claims.sub as string,
             },
-            db,
         };
     },
 });

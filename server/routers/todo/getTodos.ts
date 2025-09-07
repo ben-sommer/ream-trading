@@ -1,17 +1,13 @@
-import { Todo } from "@db/services/Todo/models/Todo";
 import { authenticatedProcedure } from "../../trpc";
 import { TRPCError } from "@trpc/server";
 import { todoItemToResponse, TodoResponse } from ".";
+import { getTodosByUserId } from "@db/models/Todo";
 
 export default authenticatedProcedure.query<TodoResponse[]>(async ({ ctx }) => {
     try {
-        const userResponse = await Todo.query
-            .todoByUser({
-                userId: ctx.user.userId,
-            })
-            .go();
+        const todoItems = await getTodosByUserId(ctx.user.userId);
 
-        return userResponse.data.map(todoItemToResponse);
+        return todoItems.map(todoItemToResponse);
     } catch (error) {
         throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",

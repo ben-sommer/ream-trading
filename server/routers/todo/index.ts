@@ -1,10 +1,10 @@
-import { EntityItem } from "electrodb";
 import { router } from "../../trpc";
 import addTodo from "./addTodo";
 import deleteTodo from "./deleteTodo";
 import getTodos from "./getTodos";
 import updateTodo from "./updateTodo";
-import { Todo } from "@db/services/Todo/models/Todo";
+import { timeUuidToDate } from "@db/utils";
+import { TodoItem } from "@db/models/Todo";
 
 export const todoRouter = router({
     addTodo,
@@ -17,20 +17,22 @@ export type TodoResponse = {
     userId: string;
     todoId: string;
     title: string;
-    completed: boolean;
+    done: boolean;
     createdAt: string;
+    updatedAt: string;
 };
 
 export const todoItemToResponse = ({
-    userId,
-    todoId,
+    user_id,
+    todo_id,
     title,
-    completed,
-    createdAt,
-}: EntityItem<typeof Todo>): TodoResponse => ({
-    userId,
-    todoId,
+    done,
+    updated_at,
+}: TodoItem): TodoResponse => ({
+    userId: user_id,
+    todoId: todo_id.toString(),
     title,
-    completed,
-    createdAt,
+    done,
+    createdAt: timeUuidToDate(todo_id).toISOString(),
+    updatedAt: updated_at.toISOString(),
 });
