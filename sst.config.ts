@@ -19,7 +19,7 @@ export default $config({
         const { TodoTable } = await import("./server/db/tables/Todo");
 
         const keyspace = new aws.keyspaces.Keyspace("Keyspace", {
-            name: "ream_trading_keyspace",
+            name: "ream_trading",
         });
 
         const newTodoTable = new aws.keyspaces.Table("TodoTable", {
@@ -93,6 +93,11 @@ export default $config({
             "$default",
             {
                 handler: "server/index.handler",
+                copyFiles: [
+                    {
+                        from: "server/db/sf-class2-root.crt",
+                    },
+                ],
                 link: [todoTable],
                 permissions: [
                     sst.aws.permission({

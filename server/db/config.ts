@@ -1,67 +1,41 @@
 import cassandra from "cassandra-driver";
-import fs from "fs";
-import { fromNodeProviderChain } from "@aws-sdk/credential-providers";
+import fs from "fs/promises";
+// @ts-ignore
 import { SigV4AuthProvider } from "aws-sigv4-auth-cassandra-plugin";
 
-export const handler = async () => {
-    // Optionally load TLS certificate for Amazon Keyspaces
+const { AWS_REGION } = process.env;
+
+const CASSANDRA_ENDPOINT = `cassandra.${AWS_REGION}.amazonaws.com`;
+
+let dbClientCache: cassandra.Client | null = null;
+
+export const getDbClient = async () => {
+    if (dbClientCache) return dbClientCache;
+
+    const cert = await fs.readFile("./server/db/sf-class2-root.crt", "utf-8");
+
     const sslOptions = {
-        ca: [
-            `-----BEGIN CERTIFICATE-----
-MIIEDzCCAvegAwIBAgIBADANBgkqhkiG9w0BAQUFADBoMQswCQYDVQQGEwJVUzEl
-MCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMp
-U3RhcmZpZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMDQw
-NjI5MTczOTE2WhcNMzQwNjI5MTczOTE2WjBoMQswCQYDVQQGEwJVUzElMCMGA1UE
-ChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjEyMDAGA1UECxMpU3RhcmZp
-ZWxkIENsYXNzIDIgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwggEgMA0GCSqGSIb3
-DQEBAQUAA4IBDQAwggEIAoIBAQC3Msj+6XGmBIWtDBFk385N78gDGIc/oav7PKaf
-8MOh2tTYbitTkPskpD6E8J7oX+zlJ0T1KKY/e97gKvDIr1MvnsoFAZMej2YcOadN
-+lq2cwQlZut3f+dZxkqZJRRU6ybH838Z1TBwj6+wRir/resp7defqgSHo9T5iaU0
-X9tDkYI22WY8sbi5gv2cOj4QyDvvBmVmepsZGD3/cVE8MC5fvj13c7JdBmzDI1aa
-K4UmkhynArPkPw2vCHmCuDY96pzTNbO8acr1zJ3o/WSNF4Azbl5KXZnJHoe0nRrA
-1W4TNSNe35tfPe/W93bC6j67eA0cQmdrBNj41tpvi/JEoAGrAgEDo4HFMIHCMB0G
-A1UdDgQWBBS/X7fRzt0fhvRbVazc1xDCDqmI5zCBkgYDVR0jBIGKMIGHgBS/X7fR
-zt0fhvRbVazc1xDCDqmI56FspGowaDELMAkGA1UEBhMCVVMxJTAjBgNVBAoTHFN0
-YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xMjAwBgNVBAsTKVN0YXJmaWVsZCBD
-bGFzcyAyIENlcnRpZmljYXRpb24gQXV0aG9yaXR5ggEAMAwGA1UdEwQFMAMBAf8w
-DQYJKoZIhvcNAQEFBQADggEBAAWdP4id0ckaVaGsafPzWdqbAYcaT1epoXkJKtv3
-L7IezMdeatiDh6GX70k1PncGQVhiv45YuApnP+yz3SFmH8lU+nLMPUxA2IGvd56D
-eruix/U0F47ZEUD0/CwqTRV/p2JdLiXTAAsgGh1o+Re49L2L7ShZ3U0WixeDyLJl
-xy16paq8U4Zt3VekyvggQQto8PT7dL5WXXp59fkdheMtlb71cZBDzI0fmgAKhynp
-VSJYACPq4xJDKVtHCN2MQWplBqjlIapBtJUhlbl90TSrE9atvNziPTnNvT51cKEY
-WQPJIrSPnNVeKtelttQKbfi3QBFGmh95DmK/D5fs4C8fF5Q=
------END CERTIFICATE-----
-`,
-        ],
+        ca: [cert],
         rejectUnauthorized: true,
-        host: `cassandra.${process.env.AWS_REGION}.amazonaws.com`,
+        host: CASSANDRA_ENDPOINT,
     };
 
     const authProvider = new SigV4AuthProvider();
 
     const client = new cassandra.Client({
-        contactPoints: [`cassandra.${process.env.AWS_REGION}.amazonaws.com`],
-        localDataCenter: process.env.AWS_REGION,
-        authProvider,
-        sslOptions,
+        contactPoints: [CASSANDRA_ENDPOINT],
+        localDataCenter: AWS_REGION,
         protocolOptions: { port: 9142 },
+        sslOptions,
+        authProvider,
+        queryOptions: {
+            consistency: cassandra.types.consistencies.localQuorum,
+        },
     });
 
-    try {
-        await client.connect();
-        console.log("Connected to AWS Keyspaces");
+    await client.connect();
 
-        const result = await client.execute("SELECT * FROM system.local");
-        console.log(result);
+    dbClientCache = client;
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ version: result.rows[0]?.release_version }),
-        };
-    } catch (err) {
-        console.error("Connection error", err);
-        throw err;
-    } finally {
-        await client.shutdown();
-    }
+    return client;
 };

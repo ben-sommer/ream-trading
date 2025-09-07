@@ -6,6 +6,7 @@ import {
 import { userRouter } from "./routers/user";
 import { APIGatewayProxyEventV2WithJWTAuthorizer } from "aws-lambda";
 import { todoRouter } from "./routers/todo";
+import { getDbClient } from "@db/config";
 
 const appRouter = router({
     user: userRouter,
@@ -14,7 +15,7 @@ const appRouter = router({
 
 export const handler = awsLambdaRequestHandler({
     router: appRouter,
-    createContext: ({
+    createContext: async ({
         event,
         context,
         info,
@@ -24,6 +25,8 @@ export const handler = awsLambdaRequestHandler({
 
         const user = event.requestContext.authorizer;
 
+        const db = await getDbClient();
+
         return {
             event,
             context,
@@ -32,6 +35,7 @@ export const handler = awsLambdaRequestHandler({
                 email: user.jwt.claims.email as string,
                 userId: user.jwt.claims.sub as string,
             },
+            db,
         };
     },
 });

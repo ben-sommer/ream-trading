@@ -4,12 +4,14 @@ import {
     type APIGatewayEventRequestContextJWTAuthorizer,
     type APIGatewayProxyEventV2,
 } from "aws-lambda";
+import { Client } from "cassandra-driver";
 
 export type Context = CreateAWSLambdaContextOptions<APIGatewayProxyEventV2> & {
     user: {
         email: string;
         userId: string;
     };
+    db: Client;
 };
 
 const t = initTRPC.context<Context>().create();
