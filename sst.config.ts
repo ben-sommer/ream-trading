@@ -20,7 +20,7 @@ export default $config({
             name: "ream_trading",
         });
 
-        const newTodoTable = new aws.keyspaces.Table("TodoTable", {
+        const todoTable = new aws.keyspaces.Table("TodoTable", {
             keyspaceName: keyspace.name,
             tableName: "todo",
             schemaDefinition: {
@@ -36,17 +36,6 @@ export default $config({
             },
             capacitySpecification: {
                 throughputMode: "PAY_PER_REQUEST",
-            },
-        });
-
-        const todoTable = new sst.aws.Dynamo("Todo", {
-            fields: {
-                pk: "string",
-                sk: "string",
-            },
-            primaryIndex: {
-                hashKey: "pk",
-                rangeKey: "sk",
             },
         });
 
@@ -90,7 +79,7 @@ export default $config({
 
         api.route("OPTIONS /{proxy+}", {
             handler: "server/cors.handler",
-            link: [todoTable, newTodoTable],
+            link: [todoTable],
         });
 
         const server = api.route(
@@ -102,7 +91,6 @@ export default $config({
                         from: "server/db/sf-class2-root.crt",
                     },
                 ],
-                link: [todoTable],
                 permissions: [
                     sst.aws.permission({
                         actions: ["cassandra:*"],

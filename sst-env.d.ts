@@ -13,10 +13,6 @@ declare module "sst" {
       "id": string
       "type": "sst.aws.CognitoIdentityPool"
     }
-    "Todo": {
-      "name": string
-      "type": "sst.aws.Dynamo"
-    }
     "UserPool": {
       "id": string
       "type": "sst.aws.CognitoUserPool"

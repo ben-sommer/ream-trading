@@ -3,13 +3,10 @@ import {
     awsLambdaRequestHandler,
     CreateAWSLambdaContextOptions,
 } from "@trpc/server/adapters/aws-lambda";
-import { userRouter } from "./routers/user";
 import { APIGatewayProxyEventV2WithJWTAuthorizer } from "aws-lambda";
 import { todoRouter } from "./routers/todo";
-import { getDbClient } from "@db/config";
 
 const appRouter = router({
-    user: userRouter,
     todo: todoRouter,
 });
 
